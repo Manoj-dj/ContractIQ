@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContractIQ - AI-Powered Contract Analysis</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-contract"></i>
+                    <span>ContractIQ</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="nav-link active" data-page="upload">Analyze</a>
+                    <a href="#" class="nav-link" data-page="about">About</a>
+                    <a href="#" class="nav-link" data-page="docs">API Docs</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Upload Section -->
+        <section id="upload-section" class="section active">
+            <div class="container">
+                <div class="hero">
+                    <h1 class="hero-title">Intelligent Contract Analysis</h1>
+                    <p class="hero-subtitle">Extract 41 clause types, assess risks, and get instant answers with AI-powered analysis</p>
+                </div>
+
+                <div class="upload-container">
+                    <div class="upload-card">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h2>Upload Your Contract</h2>
+                        <p class="upload-description">Drop your PDF contract here or click to browse</p>
+                        
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" accept=".pdf" hidden>
+                            <div class="upload-content">
+                                <i class="fas fa-file-pdf upload-icon-large"></i>
+                                <p class="upload-text">Drag & drop your PDF here</p>
+                                <button class="btn btn-secondary" id="browseBtn">
+                                    <i class="fas fa-folder-open"></i> Browse Files
+                                </button>
+                                <p class="upload-note">Maximum file size: 10MB</p>
+                            </div>
+                        </div>
+
+                        <div class="upload-info">
+                            <div class="info-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Secure & Confidential</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Analysis in 1-2 minutes</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>41 Clause Types</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Processing Section -->
+        <section id="processing-section" class="section">
+            <div class="container">
+                <div class="processing-card">
+                    <div class="processing-header">
+                        <div class="processing-icon">
+                            <i class="fas fa-cog fa-spin"></i>
+                        </div>
+                        <h2>Analyzing Your Contract</h2>
+                        <p class="processing-subtitle">Our AI is extracting clauses and assessing risks</p>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-steps">
+                            <div class="step active" id="step1">
+                                <div class="step-icon"><i class="fas fa-upload"></i></div>
+                                <span>Uploading</span>
+                            </div>
+                            <div class="step" id="step2">
+                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                <span>Extracting Text</span>
+                            </div>
+                            <div class="step" id="step3">
+                                <div class="step-icon"><i class="fas fa-search"></i></div>
+                                <span>Analyzing Clauses</span>
+                            </div>
+                            <div class="step" id="step4">
+                                <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+                                <span>Calculating Risk</span>
+                            </div>
+                            <div class="step" id="step5">
+                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                <span>Complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fun Facts Display -->
+                    <div class="facts-container">
+                        <div class="fact-card">
+                            <div class="fact-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <div class="fact-content">
+                                <h4 id="factTitle">Did you know?</h4>
+                                <p id="factText">Loading interesting contract insights...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="processing-meta">
+                        <p><strong>Document:</strong> <span id="processingFileName">contract.pdf</span></p>
+                        <p><strong>Pages:</strong> <span id="processingPages">-</span></p>
+                        <p><strong>Status:</strong> <span id="processingStatus" class="status-badge status-processing">Processing</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="section">
+            <div class="container-fluid">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h2>Contract Analysis Report</h2>
+                        <p class="document-name" id="dashboardFileName">contract.pdf</p>
+                    </div>
+                    <div class="dashboard-actions">
+                        <button class="btn btn-outline" id="exportBtn">
+                            <i class="fas fa-download"></i> Export to Excel
+                        </button>
+                        <button class="btn btn-primary" id="newAnalysisBtn">
+                            <i class="fas fa-plus"></i> New Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Risk Overview Cards -->
+                <div class="risk-overview">
+                    <div class="risk-card risk-card-main">
+                        <div class="risk-card-header">
+                            <h3>Overall Risk Score</h3>
+                        </div>
+                        <div class="risk-gauge" id="riskGauge">
+                            <svg viewBox="0 0 200 120" class="gauge-svg">
+                                <path class="gauge-background" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e5e7eb" stroke-width="20"/>
+                                <path class="gauge-fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#10b981" stroke-width="20" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                            </svg>
+                            <div class="gauge-value">
+                                <span class="gauge-score" id="overallScore">0</span>
+                                <span class="gauge-label" id="overallRiskLevel">LOW</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-stat">
+                            <div class="stat-icon stat-high">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="highRiskCount">0</span>
+                                <span class="stat-label">High Risk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-stat">
+                            <div class="stat-icon stat-medium">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="mediumRiskCount">0</span>
+                                <span class="stat-label">Medium Risk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-stat">
+                            <div class="stat-icon stat-low">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="lowRiskCount">0</span>
+                                <span class="stat-label">Low Risk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="risk-card">
+                        <div class="risk-stat">
+                            <div class="stat-icon stat-missing">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <span class="stat-value" id="missingCriticalCount">0</span>
+                                <span class="stat-label">Missing Critical</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Clauses Panel -->
+                    <div class="dashboard-panel clauses-panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-list"></i> Extracted Clauses</h3>
+                            <div class="panel-filters">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="high">High Risk</button>
+                                <button class="filter-btn" data-filter="medium">Medium Risk</button>
+                                <button class="filter-btn" data-filter="low">Low Risk</button>
+                                <button class="filter-btn" data-filter="missing">Missing</button>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="clauses-list" id="clausesList">
+                                <!-- Clauses will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Panel -->
+                    <div class="dashboard-panel chat-panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-comments"></i> Ask About This Contract</h3>
+                            <button class="btn-icon" id="clearChatBtn" title="Clear conversation">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="panel-content chat-content">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="chat-welcome">
+                                    <i class="fas fa-robot"></i>
+                                    <p>Ask me anything about this contract. I can help you understand clauses, risks, and specific terms.</p>
+                                    <div class="suggested-questions">
+                                        <p class="suggested-label">Suggested questions:</p>
+                                        <button class="suggested-btn">What is the termination notice period?</button>
+                                        <button class="suggested-btn">What are the high-risk clauses?</button>
+                                        <button class="suggested-btn">Is there a liability cap?</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about this contract...">
+                                <button type="button" class="btn-send" id="sendBtn" title="Send message">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ContractIQ. Professional Contract Analysis Platform.</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/facts.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>
