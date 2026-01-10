@@ -135,9 +135,32 @@ const Chat = {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     },
     
+    _stripMarkdown: (text) => {
+        // Remove markdown formatting for clean text display
+        return text
+            // Remove bold (**text** or __text__)
+            .replace(/\*\*(.+?)\*\*/g, '$1')
+            .replace(/__(.+?)__/g, '$1')
+            // Remove italic (*text* or _text_)
+            .replace(/\*(.+?)\*/g, '$1')
+            .replace(/_(.+?)_/g, '$1')
+            // Remove headers (# ## ###)
+            .replace(/^#{1,6}\s+/gm, '')
+            // Remove bullet points (* - •)
+            .replace(/^[\*\-•]\s+/gm, '')
+            // Remove links [text](url) -> text
+            .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+            // Remove inline code `code`
+            .replace(/`(.+?)`/g, '$1')
+            // Clean up multiple newlines
+            .replace(/\n\n+/g, '\n\n');
+    },
+    
     formatMessageText: (text) => {
+        // Strip markdown first for clean display
+        const cleanText = Chat._stripMarkdown(text);
         // Convert newlines to <br>
-        return text.replace(/\n/g, '<br>');
+        return cleanText.replace(/\n/g, '<br>');
     },
     
     addTypingIndicator: () => {
