@@ -36,7 +36,7 @@ class Settings:
     
     # RAG Settings
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-    TOP_K_RETRIEVAL: int = int(os.getenv("TOP_K_RETRIEVAL", "5"))
+    TOP_K_RETRIEVAL: int = int(os.getenv("TOP_K_RETRIEVAL", "15"))
     CONVERSATION_HISTORY_LENGTH: int = int(os.getenv("CONVERSATION_HISTORY_LENGTH", "10"))
     
     # Database Paths
