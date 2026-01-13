@@ -2,7 +2,7 @@
 # Python / Virtual Environments
 # ===============================
 venv/
-.env/
+.env
 .env.*
 __pycache__/
 *.py[cod]
@@ -22,28 +22,29 @@ dist/
 # ===============================
 *.log
 logs/
-app.log
-error.log
+backend/logs/
 
 # ===============================
 # Data & Runtime Artifacts
 # ===============================
-data/uploads/
-data/exports/
-data/chroma/
-data/*.db
+backend/data/
+backend/data/**
+
 *.sqlite
 *.sqlite3
 
 # ===============================
 # ML / AI Artifacts
 # ===============================
-checkpoints/
-checkpoint-*/
-
+# Block ALL models unless explicitly allowed via Git LFS
 *.pt
 *.bin
 *.onnx
+checkpoint-*/
+
+# Allow only the production model (tracked via Git LFS)
+!checkpoint-4089/
+!checkpoint-4089/**
 
 # ===============================
 # ChromaDB
@@ -77,23 +78,8 @@ docker-compose.override.yml
 .cache/
 tmp/
 
-
-
-backend\app\__pycache__
-backend\app\api\__pycache__
-backend\app\core\__pycache__
-backend\app\models\__pycache__
-backend\app\utils\__pycache__
-backend\logs
-backend\.env
-checkpoint-4089
-venv
-backend\data
-
-backend\data\chroma
-backend\data\exports
-backend\data\uploads
-
-
+# ===============================
+# Secrets
+# ===============================
+backend/.env
 personal access token passwords.txt
-
