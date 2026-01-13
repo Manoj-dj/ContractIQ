@@ -19,7 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          lfs: true  # Enable LFS
+      
+      - name: Pull LFS files
+        run: git lfs pull  # Explicitly pull LFS files
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -47,7 +52,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          lfs: true  # Enable LFS
+      
+      - name: Pull LFS files
+        run: git lfs pull  # Explicitly pull LFS files
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -84,7 +94,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -128,13 +138,20 @@ jobs:
 
       - name: Verify Deployment
         run: |
-          echo "⏳ Waiting for application to start..."
-          sleep 30
+          echo "⏳ Waiting for application to start (model loading takes time)..."
+          sleep 90
           
           echo "🔍 Checking health endpoint..."
-          curl -f http://localhost:8000/health || exit 1
-          
-          echo "✅ Deployment verified!"
+          for i in {1..5}; do
+            if curl -f http://localhost:8000/health; then
+              echo "✅ Deployment verified!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "❌ Health check failed after 5 attempts"
+          exit 1
 
       - name: Clean Up Old Images
         run: |
