@@ -123,15 +123,16 @@ ContractIQ/
 │   └── deploy.yml            # CI/CD pipeline
 └── README.md
 
-API Documentation
+##API Documentation
 Once running, access interactive API docs at:
 
 Swagger UI: http://localhost:8000/docs
 
 ReDoc: http://localhost:8000/redoc
 
-Deployment Pipeline
-Automated CI/CD with GitHub Actions:
+##Deployment Pipeline
+
+**Automated CI/CD with GitHub Actions:**
 
 Test Stage: Linting and unit tests
 
@@ -141,7 +142,8 @@ Push Stage: Upload to AWS ECR
 
 Deploy Stage: Pull and run on EC2 with health checks
 
-Future Enhancements
+##Future Enhancements
+
 OCR integration for scanned documents
 
 Model refinement for improved accuracy on challenging clause types
@@ -152,7 +154,7 @@ Batch processing capabilities
 
 Advanced analytics dashboard
 
-Documentation
+##Documentation
 For detailed technical documentation including model training process, architecture decisions, and deployment strategy, see PROJECT_DOCUMENTATION.pdf
 
 Author
