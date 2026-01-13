@@ -1,6 +1,6 @@
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8000',
+    BASE_URL: window.location.origin,
     ENDPOINTS: {
         UPLOAD: '/api/upload/',
         EXTRACT: '/api/extract/',
