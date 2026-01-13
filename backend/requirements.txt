@@ -3,26 +3,40 @@ fastapi==0.109.0
 uvicorn[standard]==0.27.0
 python-multipart==0.0.6
 
+
 # Environment & Configuration
 python-dotenv==1.0.0
 pydantic==2.5.3
 pydantic-settings==2.1.0
 
+
 # Database
 chromadb==0.4.22
 
-# AI/ML (Skip torch, transformers as already installed)
+
+# PyTorch CPU-ONLY (FIXED!)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+transformers==4.35.2
+tokenizers==0.15.0
+
+
+# AI/ML
 sentence-transformers==2.3.1
 google-generativeai==0.3.2
+
 
 # PDF Processing
 pdfminer.six==20221105
 pypdf2==3.0.1
 
+
 # Data Processing & Export
 pandas==2.1.4
 openpyxl==3.1.2
 numpy<2.0.0
+
 
 # Utilities
 python-dateutil==2.8.2

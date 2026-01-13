@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Data directories (will be mounted as volumes)
+backend/data/uploads/*
+backend/data/exports/*
+backend/data/chroma/*
+backend/data/sqlite/*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Documentation
+*.md
+docs/
+
+# Environment
+.env.local
+.env.development
+
+# Node (if you had any)
+node_modules/
+
+# Misc
+.DS_Store
+*.log
+personal access token passwords.txt
+test_script.py

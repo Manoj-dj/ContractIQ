@@ -1,0 +1,142 @@
+name: Deploy ContractIQ to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.gitignore'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest flake8
+          cd backend && pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          flake8 backend --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 backend --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run unit tests
+        run: |
+          echo "✅ Unit tests placeholder - add pytest tests later"
+
+  build-and-push-ecr:
+    name: Build & Push to ECR
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: latest
+        run: |
+          echo "🔨 Building Docker image..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+          
+          echo "📤 Pushing to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          
+          echo "✅ Image pushed successfully"
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  deploy-to-ec2:
+    name: Deploy to EC2
+    needs: build-and-push-ecr
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Pull Latest Image from ECR
+        run: |
+          echo "📥 Pulling latest image from ECR..."
+          docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      - name: Stop and Remove Old Container
+        run: |
+          echo "🛑 Stopping old container..."
+          docker ps -q --filter "name=contractiq" | grep -q . && docker stop contractiq && docker rm -fv contractiq || echo "No existing container"
+
+      - name: Run Docker Container
+        run: |
+          echo "🚀 Starting new container..."
+          docker run -d \
+            -p 80:8000 \
+            -p 8000:8000 \
+            --name contractiq \
+            --restart unless-stopped \
+            -v /home/ubuntu/contractiq-data/uploads:/app/backend/data/uploads \
+            -v /home/ubuntu/contractiq-data/exports:/app/backend/data/exports \
+            -v /home/ubuntu/contractiq-data/chroma:/app/backend/data/chroma \
+            -v /home/ubuntu/contractiq-data/sqlite:/app/backend/data/sqlite \
+            -e GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
+            -e ENVIRONMENT=production \
+            -e MODEL_PATH=/app/checkpoint-4089 \
+            ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+          
+          echo "✅ Container started successfully"
+
+      - name: Verify Deployment
+        run: |
+          echo "⏳ Waiting for application to start..."
+          sleep 30
+          
+          echo "🔍 Checking health endpoint..."
+          curl -f http://localhost:8000/health || exit 1
+          
+          echo "✅ Deployment verified!"
+
+      - name: Clean Up Old Images
+        run: |
+          echo "🧹 Cleaning up old Docker images..."
+          docker system prune -af --filter "until=24h"

@@ -55,27 +55,33 @@ class ClauseExtractor:
         """Load model, tokenizer, and apply INT8 quantization"""
         try:
             # Load tokenizer
-            logger.info("Loading tokenizer...")
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
-            
+            logger.info(f"Loading tokenizer...")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.model_path,
+                local_files_only=True,
+                #use_fast=False  # Avoid corrupted tokenizer.json
+            )
             # Load base model
-            logger.info("Loading base model...")
-            model = AutoModelForQuestionAnswering.from_pretrained(self.model_path)
+            logger.info(f"Loading base model...")
+            self.model = AutoModelForQuestionAnswering.from_pretrained(
+                self.model_path,
+                local_files_only=True
+            )
             
             # Force CPU for quantization (quantization works best on CPU)
             if self.device == "cuda":
                 logger.warning("INT8 quantization requires CPU. Using CPU for optimized inference.")
                 self.device = "cpu"
             
-            model.to("cpu")
-            model.eval()
+            self.model.to("cpu")
+            self.model.eval()
             
             # Apply INT8 Dynamic Quantization
             logger.info("Applying INT8 dynamic quantization (this may take 10-20 seconds)...")
             quantization_start = time.time()
             
             self.model = torch.quantization.quantize_dynamic(
-                model,
+                self.model,
                 {torch.nn.Linear},  # Quantize all Linear layers
                 dtype=torch.qint8    # Use INT8 quantization
             )
@@ -83,7 +89,7 @@ class ClauseExtractor:
             quantization_time = time.time() - quantization_start
             
             # Calculate model size reduction
-            original_size = sum(p.numel() * p.element_size() for p in model.parameters()) / (1024 * 1024)
+            original_size = sum(p.numel() * p.element_size() for p in self.model.parameters()) / (1024 * 1024)
             quantized_size = sum(p.numel() * p.element_size() for p in self.model.parameters()) / (1024 * 1024)
             size_reduction = ((original_size - quantized_size) / original_size * 100)
             

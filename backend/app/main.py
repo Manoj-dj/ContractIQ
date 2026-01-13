@@ -3,8 +3,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+from pathlib import Path
 from app.config import settings
 from app.api.routes import api_router
 from app.core.logger import get_logger
@@ -43,7 +45,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,6 +53,12 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(api_router)
+
+# Mount static files for frontend CSS/JS/assets
+frontend_path = Path("/app/frontend")
+app.mount("/css", StaticFiles(directory=str(frontend_path / "css")), name="css")
+app.mount("/js", StaticFiles(directory=str(frontend_path / "js")), name="js")
+app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="assets")
 
 # Health check endpoint
 @app.get("/health")
@@ -63,10 +71,13 @@ async def health_check():
         "model_path": settings.MODEL_PATH
     }
 
-# Root endpoint
+# Root endpoint - serve index.html
 @app.get("/")
 async def root():
-    """Root endpoint with API information"""
+    """Root endpoint - serve frontend HTML"""
+    index_file = frontend_path / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     return {
         "message": f"Welcome to {settings.APP_NAME}",
         "version": settings.APP_VERSION,
